@@ -9,7 +9,7 @@ pid_t GetGameProcesspid(char* GameProcessName) {
         err = errno;
     }
     
-    if (err == 0) {
+    if (err == 0 && length > 0) {
         struct kinfo_proc *procBuffer = (struct kinfo_proc *)malloc(length);
         if (procBuffer == NULL) {
             return -1;
@@ -27,7 +27,7 @@ pid_t GetGameProcesspid(char* GameProcessName) {
             const char *procname = procBuffer[i].kp_proc.p_comm;
             pid_t Processpid = procBuffer[i].kp_proc.p_pid;
             
-            if (strstr(procname, GameProcessName)) {
+            if (strcasestr(procname, "freefire") != NULL || (GameProcessName && strcasestr(procname, GameProcessName) != NULL)) {
                 free(procBuffer);
                 return Processpid;
             }

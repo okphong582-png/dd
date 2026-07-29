@@ -21,10 +21,7 @@ uint64_t Moudule_Base = -1;
         self.layers = [NSMutableArray array];
         self.backgroundColor = [UIColor clearColor];
 
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefireth");
-        });
+        Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefire");
 
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateBoxes)];
         [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
@@ -114,7 +111,13 @@ uint64_t Moudule_Base = -1;
     NSMutableArray<NSValue *> *boxesMutable = [NSMutableArray arrayWithCapacity:boxCount];
     int countObject = 0;
 
-    if (Moudule_Base == -1) return;
+    if (Moudule_Base == 0 || Moudule_Base == (uint64_t)-1) {
+        Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefire");
+        if (Moudule_Base == 0 || Moudule_Base == (uint64_t)-1) {
+            self.boxes = @[];
+            return;
+        }
+    }
 
     uint64_t matchGame = getMatchGame(Moudule_Base);
     uint64_t camera = CameraMain(matchGame);
@@ -141,9 +144,6 @@ uint64_t Moudule_Base = -1;
 
         bool isLocalTeam = isLocalTeamMate(myPawnObject, PawnObject);
         if (isLocalTeam) continue;
-        
-        NSString *Name = GetNickName(PawnObject);
-        if (Name.length == 0) continue;
 
         int CurHP = get_CurHP(PawnObject);
         int MaxHP = get_MaxHP(PawnObject);
